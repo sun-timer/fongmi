@@ -1,8 +1,6 @@
 // huangguo_fongmi.js
 // FongMi / 影视TV QuickJS Spider adapter
 // Adapted from Yswag/xptv-extensions huangguo.js
-import 'assets://js/lib/crypto-js.js';
-
 const SITE = 'https://huangguoai.com';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const IMG_KEY = 'f5d965df75336270';
@@ -47,25 +45,7 @@ function imageType(b64) {
 }
 
 function decryptCover(b64) {
-  if (imageType(b64)) return b64;
-  const ciphertext = CryptoJS.enc.Base64.parse(b64);
-  if (!ciphertext.sigBytes || ciphertext.sigBytes % 16) return '';
-  const plaintext = CryptoJS.AES.decrypt(
-    { ciphertext: ciphertext }, CryptoJS.enc.Utf8.parse(IMG_KEY),
-    { iv: CryptoJS.enc.Utf8.parse(IMG_IV), mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.NoPadding }
-  );
-  let hex = CryptoJS.enc.Hex.stringify(plaintext).toLowerCase();
-  if (!/^(ffd8|89504e470d0a1a0a|52494646|47494638)/.test(hex)) return '';
-  const pad = parseInt(hex.slice(-2), 16);
-  if (pad > 0 && pad <= 16 && hex.slice(-2 * pad) === pad.toString(16).padStart(2, '0').repeat(pad)) {
-    hex = hex.slice(0, -2 * pad);
-  }
-  let end = hex.lastIndexOf('ffd9');
-  if (hex.indexOf('ffd8') === 0 && end >= 0) hex = hex.slice(0, end + 4);
-  end = hex.lastIndexOf('49454e44ae426082');
-  if (hex.indexOf('89504e47') === 0 && end >= 0) hex = hex.slice(0, end + 16);
-  const out = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(hex));
-  return imageType(out) ? out : '';
+  return imageType(b64) ? b64 : '';
 }
 
 function stripTags(s) {
